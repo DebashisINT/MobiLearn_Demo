@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "300992298820",
+    "project_id": "mobilearn-demo",
+    "storage_bucket": "mobilearn-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300992298820:android:6fbc5c407cd4fe37a6a111",
+        "android_client_info": {
+          "package_name": "com.breezemobilearndemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKuQn06El55lFSwPGunCyhpvgutQtnl7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
