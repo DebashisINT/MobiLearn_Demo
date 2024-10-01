@@ -67,8 +67,12 @@ class MyLearningProgressAdapter(
             if(item.CompletionStatus){
                 isVidQuesComplete = true
             }
-            if (item.content_watch_completed && item.question_list.size == 0 && item.CompletionStatus == false && isVidQuesComplete) {
-                item.CompletionStatus = true
+            try {
+                if (item.content_watch_completed && item.question_list.size == 0 && item.CompletionStatus == false && isVidQuesComplete) {
+                    item.CompletionStatus = true
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
             if ((adapterPosition + 1) % Pref.QuestionAfterNoOfContentForLMS.toInt() == 0 ) {
                 isVidQuesComplete = false
