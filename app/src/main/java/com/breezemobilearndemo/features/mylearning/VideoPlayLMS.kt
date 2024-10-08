@@ -482,11 +482,11 @@ class VideoPlayLMS : BaseFragment() {
                             }
                             if (question_ans_setL.size > 0) {
                                 LmsQuestionAnswerSet.topic_name = topic_name
-                                    (context as DashboardActivity).loadFragment(
-                                        FragType.LmsQuestionAnswerSet,
-                                        true,
-                                        question_ans_setL/*+"~"+lastvideo*/
-                                    )
+                                (context as DashboardActivity).loadFragment(
+                                    FragType.LmsQuestionAnswerSet,
+                                    true,
+                                    question_ans_setL/*+"~"+lastvideo*/
+                                )
 
                             }
                         }
@@ -514,6 +514,8 @@ class VideoPlayLMS : BaseFragment() {
         )
 
         viewPager2.adapter = adapter
+
+
         onActivityStateChanged  = adapter.registerActivityState()
 
         // Register the screen off receiver
@@ -532,6 +534,8 @@ class VideoPlayLMS : BaseFragment() {
 
         viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                adapter.updateCurrentPosition(position)
                 // api call with currentVideoObj if currentVideoObj!=null
                 Pref.videoCompleteCount = (position+1).toString()
                 try {
@@ -589,11 +593,11 @@ class VideoPlayLMS : BaseFragment() {
                     ll_comment.visibility =View.INVISIBLE
                     ll_vdo_ply_cmmnt.visibility = View.GONE
                 }
-               /* if (contentL.get(position).isAllowShare) {
-                    ll_vdo_ply_share.visibility = View.VISIBLE
-                } else {
-                    ll_vdo_ply_share.visibility = View.GONE
-                }*/
+                /* if (contentL.get(position).isAllowShare) {
+                     ll_vdo_ply_share.visibility = View.VISIBLE
+                 } else {
+                     ll_vdo_ply_share.visibility = View.GONE
+                 }*/
 
                 //Video page like functionality
                 ll_vdo_ply_like.setOnClickListener {
@@ -660,7 +664,7 @@ class VideoPlayLMS : BaseFragment() {
                         ll_like.setBackground(mContext.getResources().getDrawable(R.drawable.back_round_corner_lms_round_white))
                         iv_vdo_ply_like.setImageResource(R.drawable.heart_red)
                     }else{
-                       // Pref.like_count = (Pref.like_count -1)
+                        // Pref.like_count = (Pref.like_count -1)
                         ll_like.visibility = View.VISIBLE
                         like_flag = false
                         ll_like.setBackground(mContext.getResources().getDrawable(R.drawable.back_round_corner_lms_round))
@@ -740,15 +744,15 @@ class VideoPlayLMS : BaseFragment() {
         })
         // Code end for Video screen after scrolling get correct position
 
-            //Code start for after click on particular content with position play that content smoothly with that correct position
-            try {
-                if(CustomStatic.VideoPosition!=-1)
-                    viewPager2.setCurrentItem(CustomStatic.VideoPosition,false)
-                CustomStatic.VideoPosition = -1
-                println("tag_val ${CustomStatic.VideoPosition}")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        //Code start for after click on particular content with position play that content smoothly with that correct position
+        try {
+            if(CustomStatic.VideoPosition!=-1)
+                viewPager2.setCurrentItem(CustomStatic.VideoPosition,false)
+            CustomStatic.VideoPosition = -1
+            println("tag_val ${CustomStatic.VideoPosition}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         //Code end for after click on particular content with position play that content smoothly with that correct position
 
 
@@ -920,7 +924,7 @@ class VideoPlayLMS : BaseFragment() {
                 player.clearMediaItems()
             }
         }
-       // (this as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // (this as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         requireActivity().unregisterReceiver(screenOffReceiver)
     }
 
@@ -936,7 +940,7 @@ class VideoPlayLMS : BaseFragment() {
                 }
             }
         } catch (e: Exception) {
-           e.printStackTrace()
+            e.printStackTrace()
         }
     }
     //Code start for comment icon click functionality update comment list
@@ -946,9 +950,9 @@ class VideoPlayLMS : BaseFragment() {
 
         println("onCommentCLick++++" + content_id)
 
-            iv_frag_video_comment_save.setOnClickListener {
+        iv_frag_video_comment_save.setOnClickListener {
 
-                if (!et_frag_video_comment.text.toString().equals("")) {
+            if (!et_frag_video_comment.text.toString().equals("")) {
 
                 AppUtils.hideSoftKeyboard(mContext as DashboardActivity)
                 var obj: CommentL = CommentL()
@@ -968,46 +972,46 @@ class VideoPlayLMS : BaseFragment() {
 
                 saveContentWiseInfoFOrComment(current_lms_video_obj)
             }
-                else{
-                    Toast.makeText(mContext, "Please write any comment", Toast.LENGTH_SHORT).show()
-                }
+            else{
+                Toast.makeText(mContext, "Please write any comment", Toast.LENGTH_SHORT).show()
+            }
         }
     }
     //Code end for comment icon click functionality update comment list
     private fun commentAPICalling(content_id: String) {
-            try {
-                Timber.d("deleteImei call" + AppUtils.getCurrentDateTime())
-                val repository = LMSRepoProvider.getTopicList()
-                BaseActivity.compositeDisposable.add(
-                    repository.getCommentInfo(topic_id,content_id )
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe({ result ->
-                            val response = result as MyCommentListResponse
-                            try {
-                                if (response.status == NetworkConstant.SUCCESS) {
-                                    Pref.comment_count = (Pref.comment_count + 1)
-                                    commentL = ArrayList<CommentL>()
-                                    ll_frag_video_play_comments.visibility = View.VISIBLE
-                                    loadCommentData(response.comment_list.filter { it.content_id.toString().equals(content_id.toString()) } as ArrayList<CommentL>)
+        try {
+            Timber.d("deleteImei call" + AppUtils.getCurrentDateTime())
+            val repository = LMSRepoProvider.getTopicList()
+            BaseActivity.compositeDisposable.add(
+                repository.getCommentInfo(topic_id,content_id )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val response = result as MyCommentListResponse
+                        try {
+                            if (response.status == NetworkConstant.SUCCESS) {
+                                Pref.comment_count = (Pref.comment_count + 1)
+                                commentL = ArrayList<CommentL>()
+                                ll_frag_video_play_comments.visibility = View.VISIBLE
+                                loadCommentData(response.comment_list.filter { it.content_id.toString().equals(content_id.toString()) } as ArrayList<CommentL>)
 
-                                }else{
-                                    //(mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
-                                    var blankL : ArrayList<CommentL> = ArrayList()
-                                    loadCommentData(blankL)
-                                }
-                            } catch (e: Exception) {
+                            }else{
+                                //(mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                                 var blankL : ArrayList<CommentL> = ArrayList()
                                 loadCommentData(blankL)
                             }
-                        }, { error ->
-                            (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
-                        })
-                )
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
-            }
+                        } catch (e: Exception) {
+                            var blankL : ArrayList<CommentL> = ArrayList()
+                            loadCommentData(blankL)
+                        }
+                    }, { error ->
+                        (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+                    })
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+        }
     }
 
     fun loadCommentData(comL: ArrayList<CommentL>) {
@@ -1170,7 +1174,7 @@ class VideoPlayLMS : BaseFragment() {
 
                         }
                     }, { error ->
-                       error.printStackTrace()
+                        error.printStackTrace()
                     })
             )
         } catch (ex: Exception) {

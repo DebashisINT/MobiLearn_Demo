@@ -5586,6 +5586,12 @@ class DashboardFragment : BaseFragment(), View.OnClickListener/*, HBRecorderList
                                 //Suman 18-09-2024 mantis 27700
                                 if (configResponse.IsRetailOrderStatusRequired != null)
                                     Pref.IsRetailOrderStatusRequired = configResponse.IsRetailOrderStatusRequired!!
+
+                                //Puja 07-10-2024 mantis 27700
+                                if (configResponse.IsVideoAutoPlayInLMS != null)
+                                    Pref.IsVideoAutoPlayInLMS = configResponse.IsVideoAutoPlayInLMS!!
+
+
                             }
                             BaseActivity.isApiInitiated = false
                             /*API_Optimization 02-03-2022*/

@@ -97,6 +97,13 @@ class VideoAdapter(var viewPager2: ViewPager2,
     private lateinit var wakeLock: PowerManager.WakeLock
     private var currentPlayingViewHolder: VideoViewHolder? = null
     private lateinit var popupWindow: PopupWindow
+    private lateinit var exoPlayer: ExoPlayer
+    private var currentPosition = 0
+
+    fun updateCurrentPosition(position: Int) {
+        currentPosition = position
+        notifyItemChanged(position)
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
@@ -118,22 +125,56 @@ class VideoAdapter(var viewPager2: ViewPager2,
 
     private var onVideoPlaybackStateChangedListener: OnVideoPlaybackStateChangedListener? = null
 
+    init {
+        // Initialize ExoPlayer with a track selector
+        val trackSelector = DefaultTrackSelector(context)
+        exoPlayer = ExoPlayer.Builder(context).setTrackSelector(trackSelector)
+            .setRenderersFactory(
+                DefaultRenderersFactory(context).setEnableDecoderFallback(
+                    true
+                )
+            ).setSeekForwardIncrementMs(10000L)
+            .setSeekBackIncrementMs(10000L).build()
+    }
+
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        lateinit var exoPlayer: ExoPlayer
         lateinit var mediaSource: MediaSource
         var video_watch_completed = false
         var like_flag = false
         var seek_dragging = false
         private val savedContentIds = mutableSetOf<Int>()
 
+        fun pauseVideo() {
+            exoPlayer.pause()
+        }
+
         fun bindItems(holder: VideoViewHolder, context: Context, videos_: ArrayList<ContentL>, listner: OnVideoPreparedListener) {
+
+
+            if (holder.absoluteAdapterPosition == viewPager2.currentItem) {
+                holder.itemView.stylplayerView.player = exoPlayer
+                if (Pref.IsVideoAutoPlayInLMS){
+                    exoPlayer!!.playWhenReady = true
+                }else {
+                    exoPlayer!!.playWhenReady = false
+                }
+                exoPlayer.play()
+            } else {
+                holder.itemView.stylplayerView.player = null
+            }
+
+
+            if (holder.adapterPosition != viewPager2.currentItem) {
+                holder.pauseVideo()
+            }
 
             if (videos_.get(absoluteAdapterPosition).content_url.contains(
                     ".mp4",
                     ignoreCase = true
                 )
             ) {
+
                 setVideoPath(
                     holder,
                     videos_.get(absoluteAdapterPosition).content_url,
@@ -172,9 +213,9 @@ class VideoAdapter(var viewPager2: ViewPager2,
                 val time = LocalTime.parse(model.content_watch_length, formatter)
                 val milliseconds = time.toSecondOfDay() * 1000L
                 println("Milliseconds: $milliseconds")
-                exoPlayer.seekTo(milliseconds)
+                exoPlayer!!.seekTo(milliseconds)
             } else {
-                exoPlayer.seekTo(0)
+                exoPlayer!!.seekTo(0)
 
             }
 
@@ -263,10 +304,9 @@ class VideoAdapter(var viewPager2: ViewPager2,
         ) {
 
             try {
-                // exoPlayer.clearMediaItems()
-                exoPlayer.release()
+                //exoPlayer!!.clearMediaItems()
+                exoPlayer!!.release()
                 itemView.stylplayerView.player?.release()
-                //itemView.stylplayerView.player?.clearMediaItems()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -293,7 +333,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
             trackSelector.setParameters(parametersBuilder)
 
 
-            exoPlayer.addListener(object : Player.Listener {
+            exoPlayer!!.addListener(object : Player.Listener {
 
                 /*override fun onVideoSizeChanged(videoSize: VideoSize) {
                     super.onVideoSizeChanged(videoSize)
@@ -327,10 +367,10 @@ class VideoAdapter(var viewPager2: ViewPager2,
                         println("tag_puja STATE_FAST_FORWARDING  $seek_dragging")
                     }*/
 
-                    position_ = exoPlayer.currentPosition //Returns the playback position in the current content
-                    duration = exoPlayer.duration //Returns the duration of the current content
+                    position_ = exoPlayer!!.currentPosition //Returns the playback position in the current content
+                    duration = exoPlayer!!.duration //Returns the duration of the current content
 
-                    onVideoPlaybackStateChangedListener?.onVideoPlaybackStateChanged(exoPlayer.currentPosition, exoPlayer.duration)
+                    onVideoPlaybackStateChangedListener?.onVideoPlaybackStateChanged(exoPlayer!!.currentPosition, exoPlayer!!.duration)
 
                     percentageWatched = (100 * position_ / duration)
                     if (percentageWatched.toInt() == 100) {
@@ -390,7 +430,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
                             "Mobile",
                             "Android",
                             LocationWizard.getNewLocationName(context, Pref.current_latitude.toDouble(), Pref.current_longitude.toDouble()),
-                            exoPlayer.playbackParameters.speed.toString(),
+                            exoPlayer!!.playbackParameters.speed.toString(),
                             percentageWatched.toInt(),
                             0,
                             0,
@@ -438,7 +478,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
                                 "Mobile",
                                 "Android",
                                 LocationWizard.getNewLocationName(context, Pref.current_latitude.toDouble(), Pref.current_longitude.toDouble()),
-                                exoPlayer.playbackParameters.speed.toString(),
+                                exoPlayer!!.playbackParameters.speed.toString(),
                                 percentageWatched.toInt(),
                                 0,
                                 0,
@@ -503,7 +543,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
 
                             // if (qList.size>0 ) {
                             println("seek_dragging >>>  "+seek_dragging)
-                            if (exoPlayer.playbackParameters.speed != 2.0.toFloat() && !seek_dragging /*&& !LmsQuestionAnswerSet.question_submit*/ ) {
+                            if (exoPlayer!!.playbackParameters.speed != 2.0.toFloat() && !seek_dragging /*&& !LmsQuestionAnswerSet.question_submit*/ ) {
                                 //if (true) { // test code
                                 println("qqqqqqq"+savedContentIds.content_id)
                                 println("question_submit_content_id"+LmsQuestionAnswerSet.question_submit_content_id)
@@ -561,22 +601,25 @@ class VideoAdapter(var viewPager2: ViewPager2,
             itemView.iv_list_video.visibility = View.GONE
             itemView.stylplayerView.visibility = View.VISIBLE
 
-            exoPlayer.seekTo(0)
-            exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
+            exoPlayer!!.seekTo(0)
+            exoPlayer!!.repeatMode = Player.REPEAT_MODE_OFF
 
             val dataSourceFactory = DefaultDataSource.Factory(context)
 
             mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(Uri.parse(contentUrl)))
-            exoPlayer.setMediaSource(mediaSource)
-            exoPlayer.prepare()
-
+            exoPlayer!!.setMediaSource(mediaSource)
+            exoPlayer!!.prepare()
+            itemView.stylplayerView.player = exoPlayer
+            //exoPlayer!!.playWhenReady = true
+            //exoPlayer!!.play()
             itemView.progress_wheel.visibility = View.GONE
-            if (absoluteAdapterPosition == 0) {
-                exoPlayer.playWhenReady = true
-                exoPlayer.play()
+
+            /* if (absoluteAdapterPosition == 0) {
+                exoPlayer!!.playWhenReady = true
+                exoPlayer!!.play()
                 itemView.progress_wheel.stopSpinning()
-            }
+            }*/
             /*if (position == viewPager2.currentItem+2) {
                 // If so, start playback
                 exoPlayer.playWhenReady = true
@@ -585,9 +628,15 @@ class VideoAdapter(var viewPager2: ViewPager2,
 
             println("tag_posss absoluteAdapterPosition:$absoluteAdapterPosition")
 
-            exoPlayer.playWhenReady = false
-            videoPreparedListener.onVideoPrepared(ExoPlayerItem(exoPlayer, absoluteAdapterPosition))
-            itemView.stylplayerView.player = exoPlayer
+            //
+
+            if (Pref.IsVideoAutoPlayInLMS){
+                exoPlayer!!.playWhenReady = true
+            }else {
+                exoPlayer!!.playWhenReady = false
+            }
+            videoPreparedListener.onVideoPrepared(ExoPlayerItem(exoPlayer!!, absoluteAdapterPosition))
+
 
         }
 
@@ -759,9 +808,15 @@ class VideoAdapter(var viewPager2: ViewPager2,
         }
     }
 
+
     fun pauseCurrentVideo() {
-        currentPlayingViewHolder?.exoPlayer?.pause()
+        currentPlayingViewHolder?.pauseVideo()
     }
+
+
+    /* fun pauseCurrentVideo() {
+         currentPlayingViewHolder?.exoPlayer?.pause()
+     }*/
 
     interface OnVideoPreparedListener {
         fun onVideoPrepared(exoPlayerItem: ExoPlayerItem)

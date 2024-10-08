@@ -1102,6 +1102,11 @@ object Pref : PreferenceHolder() {
     var IsRetailOrderStatusRequired: Boolean by bindToPreferenceField(false, "IsRetailOrderStatusRequired")
 
     var loginID: String by bindToPreferenceField("", "loginID")
+
+
+    //Mantis 0027717 Puja 07.10.2024
+    var IsVideoAutoPlayInLMS : Boolean by bindToPreferenceField(true, "IsVideoAutoPlayInLMS")
+
 }
 
 

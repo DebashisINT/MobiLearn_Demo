@@ -18,7 +18,7 @@
             android:layout_height="@dimen/_100sdp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/_10sdp"
-            android:src="@drawable/ic_menu_profile_image"
+            android:src="@drawable/app_user_img_new"
             app:civ_border_color="@color/colorAccent"
             app:civ_border_width="@dimen/_2sdp" />
 

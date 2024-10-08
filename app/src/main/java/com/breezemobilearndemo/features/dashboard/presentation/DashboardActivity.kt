@@ -547,6 +547,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
         //Pref.IsEditEnableforOpportunity = true
         //Pref.IsDeleteEnableforOpportunity = true
         Pref.IsUsbDebuggingRestricted = false
+        //Pref.IsVideoAutoPlayInLMS = false
         //getFCMtoken()
         showToolbar()
         println("load_frag " + mFragType.toString() + " " + Pref.user_id.toString() + " " + Pref.QuestionAfterNoOfContentForLMS)
@@ -3336,8 +3337,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
                 Glide.with(mContext)
                     .load(Pref.profile_img)
                     .apply(
-                        RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image)
-                            .error(R.drawable.ic_menu_profile_image)
+                        RequestOptions.placeholderOf(R.drawable.app_user_img_new)
+                            .error(R.drawable.app_user_img_new)
                     )
                     .into(profilePicture)
             } catch (ex: Exception) {
@@ -3348,8 +3349,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
                 Glide.with(mContext)
                     .load(Pref.profile_img)
                     .apply(
-                        RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image)
-                            .error(R.drawable.ic_menu_profile_image)
+                        RequestOptions.placeholderOf(R.drawable.app_user_img_new)
+                            .error(R.drawable.app_user_img_new)
                     )
                     .into(profilePicture_adv)
             } catch (ex: Exception) {
@@ -3357,7 +3358,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
             }
 
         } else {
-            profilePicture.setImageResource(R.drawable.ic_menu_profile_image)
+            profilePicture.setImageResource(R.drawable.app_user_img_new)
         }
 
         login_time_am_tv.text = Pref.merediam
@@ -4721,8 +4722,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
                     Glide.with(mContext)
                         .load(Pref.profile_img)
                         .apply(
-                            RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image)
-                                .error(R.drawable.ic_menu_profile_image)
+                            RequestOptions.placeholderOf(R.drawable.app_user_img_new)
+                                .error(R.drawable.app_user_img_new)
                         )
                         .into(profilePicture)
                 } catch (e: Exception) {
@@ -4733,8 +4734,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
                     Glide.with(mContext)
                         .load(Pref.profile_img)
                         .apply(
-                            RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image)
-                                .error(R.drawable.ic_menu_profile_image)
+                            RequestOptions.placeholderOf(R.drawable.app_user_img_new)
+                                .error(R.drawable.app_user_img_new)
                         )
                         .into(profilePicture_adv)
                 } catch (e: Exception) {
@@ -5496,7 +5497,16 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
             }
 
             R.id.iv_profile_picture, R.id.iv_profile_picture_menu_adv -> {
+
                 loadFragment(FragType.MyProfileFragment, false, "")
+
+                if (Pref.IsUserWiseLMSFeatureOnly){
+                    window.setStatusBarColor(resources.getColor(R.color.toolbar_lms))
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.toolbar_lms))
+                } else {
+                    window.setStatusBarColor(resources.getColor(R.color.colorPrimary))
+                    toolbar.setBackgroundResource(R.drawable.custom_toolbar_back)
+                }
             }
 
             R.id.maps_TV -> {
@@ -11099,6 +11109,9 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation,
         var cf = getFragment()
         println("tag_kali begin ${getFragment()}")
         if (getFragment() != null && getFragment() is NotificationLMSFragment) {
+            loadFragment(FragType.MyLearningFragment, false, DashboardType.Home)
+        }
+        else if (getFragment() != null && getFragment() is MyProfileFragment && Pref.IsUserWiseLMSFeatureOnly == true) {
             loadFragment(FragType.MyLearningFragment, false, DashboardType.Home)
         }
         else if (getFragment() != null && getFragment() is PrivacypolicyWebviewFrag && Pref.IsUserWiseLMSFeatureOnly == true) {

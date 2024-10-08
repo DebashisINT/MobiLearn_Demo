@@ -408,7 +408,7 @@ class MyProfileFragment : BaseFragment() {
 
         Glide.with(mContext)
                 .load(Pref.profile_img)
-                .apply(RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image).error(R.drawable.ic_menu_profile_image))
+                .apply(RequestOptions.placeholderOf(R.drawable.app_user_img_new).error(R.drawable.app_user_img_new))
                 .into(profilePicture)
 
         profile_name_TV.setText(Pref.user_name)
@@ -849,7 +849,7 @@ class MyProfileFragment : BaseFragment() {
 
         Glide.with(mContext)
                 .load(imgRealPath)
-                .apply(RequestOptions.placeholderOf(R.drawable.ic_menu_profile_image).error(R.drawable.ic_menu_profile_image))
+                .apply(RequestOptions.placeholderOf(R.drawable.app_user_img_new).error(R.drawable.app_user_img_new))
                 .into(profilePicture)
     }
 

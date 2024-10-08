@@ -227,4 +227,6 @@ class ConfigFetchResponseModel : BaseResponse() {
     var IsAllowGPSTrackingInBackgroundForLMS:Boolean? = false
     var IsRetailOrderStatusRequired:Boolean? = false
 
+    var IsVideoAutoPlayInLMS:Boolean? = false
+
 }
