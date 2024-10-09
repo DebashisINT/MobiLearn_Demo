@@ -352,7 +352,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
 
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
-                    Toast.makeText(context, "Can't play this video", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(context, "Can't play this video", Toast.LENGTH_SHORT).show()
                 }
 
                 @SuppressLint("SuspiciousIndentation")
@@ -488,6 +488,23 @@ class VideoAdapter(var viewPager2: ViewPager2,
 
                             listner.onContentInfoAPICalling(data_end_LMS_CONTENT_INFO)
 
+                            if (Pref.IsVideoAutoPlayInLMS) {
+                                if(Pref.LastVideoPlay_VidPosition.toInt() == absoluteAdapterPosition)
+                                showWatchPointPopup(absoluteAdapterPosition, content_watch_point)
+                                Handler().postDelayed({
+                                    exoPlayer!!.repeatMode = Player.REPEAT_MODE_ONE
+                                    exoPlayer!!.seekTo(0)
+                                    exoPlayer!!.play()
+                                }, 6000) // delay for 2 seconds
+                            } else {
+                                if(CustomStatic.IsHomeClick == true){
+                                    CustomStatic.IsHomeClick = false
+                                }else{
+                                    if(Pref.LastVideoPlay_VidPosition.toInt() == absoluteAdapterPosition)
+                                        showWatchPointPopup(absoluteAdapterPosition , content_watch_point)
+                                }
+                            }
+
                         }
 
                         Player.STATE_READY -> {
@@ -517,12 +534,12 @@ class VideoAdapter(var viewPager2: ViewPager2,
                     else if (/*playbackState != Player.STATE_BUFFERING &&*/ playbackState == Player.STATE_ENDED /*&& position != videos.size - 1*/) {
 
                         // getPointsAPICalling(absoluteAdapterPosition)
-                        if(CustomStatic.IsHomeClick == true){
+                       /* if(CustomStatic.IsHomeClick == true){
                             CustomStatic.IsHomeClick = false
                         }else{
                             if(Pref.LastVideoPlay_VidPosition.toInt() == absoluteAdapterPosition)
                             showWatchPointPopup(absoluteAdapterPosition , content_watch_point)
-                        }
+                        }*/
 
 
                         //Pref.content_watch_count = Pref.content_watch_count+1
@@ -603,7 +620,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
             itemView.stylplayerView.visibility = View.VISIBLE
 
             exoPlayer!!.seekTo(0)
-            exoPlayer!!.repeatMode = Player.REPEAT_MODE_OFF
+           // exoPlayer!!.repeatMode = Player.REPEAT_MODE_OFF
 
             val dataSourceFactory = DefaultDataSource.Factory(context)
 
@@ -754,7 +771,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
         //  }
 
         println("tag_animate anim")
-        val a: Animation = AnimationUtils.loadAnimation(context, com.breezemobilearndemo.R.anim.scale)
+        val a: Animation = AnimationUtils.loadAnimation(context, R.anim.scale)
         a.reset()
         popup_message.clearAnimation()
         popup_message.startAnimation(a)
@@ -782,7 +799,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
                     popup_message.visibility = View.VISIBLE
                     popupWindow.dismiss()
                     if (Pref.IsVideoAutoPlayInLMS){
-                        exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
+                       // exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
                     }else {
                         viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
                     }
