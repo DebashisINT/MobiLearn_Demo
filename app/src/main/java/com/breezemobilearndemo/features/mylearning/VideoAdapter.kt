@@ -520,6 +520,7 @@ class VideoAdapter(var viewPager2: ViewPager2,
                         if(CustomStatic.IsHomeClick == true){
                             CustomStatic.IsHomeClick = false
                         }else{
+                            if(Pref.LastVideoPlay_VidPosition.toInt() == absoluteAdapterPosition)
                             showWatchPointPopup(absoluteAdapterPosition , content_watch_point)
                         }
 
@@ -780,7 +781,12 @@ class VideoAdapter(var viewPager2: ViewPager2,
                     popup_image.visibility = View.GONE
                     popup_message.visibility = View.VISIBLE
                     popupWindow.dismiss()
-                    viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
+                    if (Pref.IsVideoAutoPlayInLMS){
+                        exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
+                    }else {
+                        viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
+                    }
+                    //viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
                 }, 1)
 
 
